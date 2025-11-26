@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { AppErrorForbidden, AppErrorUnauthorized } from 'src/utils/errors/app-errors';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { IRequestUser } from 'src/core/modules/common/modules/auth/authentication/auth.interfaces';
+import { UserRole } from 'generated/prisma';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -11,7 +12,9 @@ export class RolesGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     let hasAccess = false;
 
-    const roles = this.reflector.get<string[]>(ROLES_KEY, context.getHandler());
+    const roles =
+      this.reflector.get<string[]>(ROLES_KEY, context.getClass()) ??
+      this.reflector.get<string[]>(ROLES_KEY, context.getHandler());
 
     if (!roles) {
       return true;
@@ -24,7 +27,7 @@ export class RolesGuard implements CanActivate {
       throw new AppErrorUnauthorized('Usuário não autenticado');
     }
 
-    if (user.role === 'ADMIN') {
+    if (user.role === UserRole.ADMIN) {
       return true;
     }
 
