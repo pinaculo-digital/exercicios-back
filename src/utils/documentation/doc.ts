@@ -1,4 +1,4 @@
-import { applyDecorators, HttpStatus } from '@nestjs/common';
+import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
 import {
   ApiOperation,
   ApiResponse,
@@ -26,6 +26,7 @@ export function Doc(params: {
       description: params.description,
       deprecated: isDeprecated,
     }),
+    HttpCode(statusCode),
   ];
 
   if (hasAuth) {
